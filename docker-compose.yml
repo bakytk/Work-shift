@@ -1,0 +1,37 @@
+version: "3.2"
+services:
+
+  work_app:
+    restart: unless-stopped
+    env_file: .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - published: ${SERVER_PORT:-15500}
+        target: 15500
+    environment:
+      - JWT_SECRET=$JWT_SECRET
+      - DB_HOST=mongo_db
+      - DB_NAME=$DB_NAME
+      - DB_PORT=$DB_PORT
+      - DB_USER=$DB_USER
+      - DB_PWD=$DB_PWD
+    links:
+      - mongo_db
+
+  mongo_db:
+    image: mongo
+    container_name: mongo_db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$DB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$DB_PWD
+    ports:
+      - "27017:27017"
+    volumes:
+      - work_mongo:/data/db
+
+volumes:
+  work_mongo:

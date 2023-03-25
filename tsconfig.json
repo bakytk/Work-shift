@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "lib": ["es6", "dom"],
+    "strict": false,
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}
