@@ -1,0 +1,268 @@
+{
+	"info": {
+		"_postman_id": "378a2b49-af47-4409-a341-f34e127dc5f7",
+		"name": "SHIFT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18542445"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\"username\": \"work2@outlook.com\", \"password\": 1234, \"role\": \"worker\"}"
+				},
+				"url": {
+					"raw": "http://localhost:15500/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "15500",
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ping",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\"username\": \"bak2@outlook.com\", \"password\": 1234, \"role\": \"admin\"}"
+				},
+				"url": {
+					"raw": "http://localhost:15500/ping",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "15500",
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\"username\": \"bak@outlook.com\", \"password\": 1234}"
+				},
+				"url": {
+					"raw": "http://localhost:15500/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "15500",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createShift",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YjlhMGQ0Ni1jZmRjLTRhOWItODgxYS0xNzU5N2FkNDFkYTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2Nzk4MzcxNTIsImV4cCI6MTY3OTgzODk1Mn0.lO_EPqIZ_N2BrIUq6HATYlYx64JtXlnyeEmUTgFKM_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\"userId\": \"976411fb-045f-4c9a-b004-8ecd5f648d01\", \"timeString\": \"2023/1/4/8-16\"}"
+				},
+				"url": {
+					"raw": "http://localhost:15500/shift",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "15500",
+					"path": [
+						"shift"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "putShift",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YjlhMGQ0Ni1jZmRjLTRhOWItODgxYS0xNzU5N2FkNDFkYTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2Nzk4MzkwNzksImV4cCI6MTY3OTg0MDg3OX0.vlOSwYdtuGQYzdZaP8cNULsIE4KVWGeIyJEM9Icwv6o",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\"userId\": \"976411fb-045f-4c9a-b004-8ecd5f648d01\", \"shiftId\": \"c27244ef-cf68-4624-9690-bb5d035d2dfb\", \"timeString\": \"2023/1/4/8-16\"}"
+				},
+				"url": {
+					"raw": "http://localhost:15500/shift",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "15500",
+					"path": [
+						"shift"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteShift",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YjlhMGQ0Ni1jZmRjLTRhOWItODgxYS0xNzU5N2FkNDFkYTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2Nzk4MzkwNzksImV4cCI6MTY3OTg0MDg3OX0.vlOSwYdtuGQYzdZaP8cNULsIE4KVWGeIyJEM9Icwv6o",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\"userId\": \"976411fb-045f-4c9a-b004-8ecd5f648d01\", \"shiftId\": \"c27244ef-cf68-4624-9690-bb5d035d2dfb\", \"timeString\": \"2023/1/4/8-16\"}"
+				},
+				"url": {
+					"raw": "http://localhost:15500/shift/21a66795-8800-40fd-8645-f1881a0c9fde",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "15500",
+					"path": [
+						"shift",
+						"21a66795-8800-40fd-8645-f1881a0c9fde"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getShifts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YjlhMGQ0Ni1jZmRjLTRhOWItODgxYS0xNzU5N2FkNDFkYTgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2Nzk4MzkyODIsImV4cCI6MTY3OTg0MTA4Mn0.My6nA7bRaA8wJd4gAmmPf-LpOxkbGy6ESKMpcd7q8HI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\"userId\": \"976411fb-045f-4c9a-b004-8ecd5f648d01\", \"timeString\": \"2023/12/13/0-8\"}"
+				},
+				"url": {
+					"raw": "http://localhost:15500/shifts/976411fb-045f-4c9a-b004-8ecd5f648d01",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "15500",
+					"path": [
+						"shifts",
+						"976411fb-045f-4c9a-b004-8ecd5f648d01"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
