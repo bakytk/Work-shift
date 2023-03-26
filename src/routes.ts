@@ -1,8 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import bodyParser from "body-parser";
-router.use(bodyParser.json());
+router.use(express.json());
 
 import { controllers } from "./controllers";
 

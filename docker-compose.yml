@@ -17,6 +17,7 @@ services:
       - DB_PORT=$DB_PORT
       - DB_USER=$DB_USER
       - DB_PWD=$DB_PWD
+      - DOCKER_ENV='true'
     links:
       - mongo_db
 

@@ -1,9 +1,16 @@
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 import { TokenData } from "./types";
 const JWT_SECRET: string = process.env.JWT_SECRET || "";
 if (!JWT_SECRET) {
   throw new Error("Missing JWT_SECRET env");
 }
+
+import { IUser } from "./types";
+import { User, Shift } from "./db/models";
+import connect from "./db/connect";
+import { DB_URL } from "./db/config";
+connect({ DB_URL });
 
 export const controllers = {
   Fallback: async (req, res) => {
@@ -17,23 +24,27 @@ export const controllers = {
 
   Register: async (req, res) => {
     try {
-      let { username, password } = req.body;
+      let { username, password, role } = req.body;
       console.log("req.body", req.body);
-      if (!(username && password)) {
+      if (!(username && password && role)) {
         return res
           .status(406)
-          .send("Either of 'username or password' is absent!");
+          .send("Either of 'username-password-role' is absent!");
       }
+      let userId: string = uuidv4();
       let data = {
         username,
-        password
+        password,
+        userId,
+        role
       };
-      // let user = new User({
-      //   ...data
-      // });
-      // await user.save();
+      let user = new User({
+        ...data
+      });
+      await user.save();
       let tokenData: TokenData = {
-        username
+        userId,
+        role
       };
       let token: string = jwt.sign(tokenData, JWT_SECRET, { expiresIn: "30m" });
       res.status(201).json({
