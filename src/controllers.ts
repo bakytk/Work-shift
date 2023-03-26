@@ -9,9 +9,26 @@ if (!JWT_SECRET) {
 
 import { IUser } from "./types";
 import { User, Shift } from "./db/models";
-import connect from "./db/connect";
-import { DB_URL } from "./db/config";
-connect({ DB_URL });
+
+function stringParser (string, res) {
+  let input = string.split("/");
+  let year = parseInt(input[0]);
+  let month = parseInt(input[1]);
+  let day = parseInt(input[2]);
+  if (!["0-8", "8-16", "16-24"].includes(input[3])){
+    return res.status(406).send("Invalid timeslot");
+  }
+  let timeSlot = Math.ceil(parseInt(input[3].split("-")[0])/8);
+  //console.log("time:", timeSlot, year, month, day);
+  //validate date:
+  let formatDate = moment([year, month-1, day]).format("YYYY/MM/DD");
+  //console.log("formatDate:", formatDate);
+  let validDate = moment(formatDate, 'YYYY/MM/DD',true).isValid();
+  if (!validDate){
+    return res.status(406).send("Date not validated");
+  }
+  return [year, month-1, day, timeSlot];
+}
 
 export const controllers = {
   Fallback: async (req, res) => {
@@ -126,23 +143,8 @@ export const controllers = {
       /*
         parse timeString:
       */
-      let input = timeString.split("/");
-      let year = parseInt(input[0]);
-      let month = parseInt(input[1]);
-      let day = parseInt(input[2]);
-      if (!["0-8", "8-16", "16-24"].includes(input[3])){
-        return res.status(406).send("Invalid timeslot");
-      }
-      let timeSlot = Math.ceil(parseInt(input[3].split("-")[0])/8);
-      console.log("time:", timeSlot, year, month, day);
-      //validate date:
-      let formatDate = moment([year, month-1, day]).format("YYYY/MM/DD");
-      console.log("formatDate:", formatDate);
-      let validDate = moment(formatDate, 'YYYY/MM/DD',true).isValid();
-      if (!validDate){
-        return res.status(406).send("Date not validated");
-      }
-      let date = new Date(year, month-1, day);
+      let [year, month, day, timeSlot] = stringParser(timeString, res);
+      let date = new Date(year, month, day);
 
       /*
         check if there's a shift on this day
@@ -194,6 +196,38 @@ export const controllers = {
     } catch (e) {
       console.error("GetShifts error", e);
       res.status(500).send(`GetShifts error: ${e.message}`);
+    }
+  },
+
+  UpdateTime: async (req, res) => {
+    try {
+      let { userId: adminId, role } = req.decode;
+      if (!(adminId && role === "admin")) {
+        return res.status(401).send("User not authorized");
+      }
+      let { userId, shiftId, timeString } = req.body;
+      if (! (userId && shiftId && timeString)) {
+        return res.status(406).send("One of required params not passed!");
+      }
+
+      /*
+        check if shiftId, userId match
+      */
+      let shiftMatch = await Shift.findOne({ userId, shiftId });
+      if (!shiftMatch) {
+        return res.status(404).send("Shift-user pair not found!");
+      }
+
+      /*
+        update
+      */
+      let [year, month, day, timeSlot] = stringParser(timeString, res);
+      let date = new Date(year, month, day);
+      await Shift.findOneAndUpdate({ userId, shiftId }, { userId, shiftId, timeSlot, day: date});
+      return res.status(204).json({ message: "Shift successfully updated!" });
+    } catch (e) {
+      console.error("putShift", e);
+      res.status(500).send(`putShift error: ${e.message}`);
     }
   },
 };

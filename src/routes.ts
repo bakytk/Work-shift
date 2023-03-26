@@ -19,6 +19,7 @@ router.post("/login", controllers.Login);
 //CRUD shift
 router.post("/shift", confirmToken, controllers.CreateShift);
 router.get("/shifts/:userId", confirmToken, controllers.GetShifts);
+router.put("/shift", confirmToken, controllers.UpdateTime);
 
 router.all("/*", controllers.Fallback);
 router.use((error, _, res, __) => {
