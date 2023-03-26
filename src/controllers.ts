@@ -18,14 +18,14 @@ export const controllers = {
   },
 
   Ping: async (req, res) => {
-    console.log("ping req", req);
+    //console.log("ping req", req);
     return res.status(200).json({ message: "Pong!" });
   },
 
   Register: async (req, res) => {
     try {
       let { username, password, role } = req.body;
-      console.log("req.body", req.body);
+      //console.log("req.body", req.body);
       if (!(username && password && role)) {
         return res
           .status(406)
@@ -38,6 +38,13 @@ export const controllers = {
         userId,
         role
       };
+      let usernameMatch = await User.find({
+        username
+      });
+      //console.log("usernameMatch", usernameMatch);
+      if (usernameMatch.length > 0) {
+        return res.status(401).send("Username already exists!");
+      }
       let user = new User({
         ...data
       });
@@ -73,7 +80,7 @@ export const controllers = {
       if (!(user.length > 0)) {
         return res.status(401).send("Username not found!");
       }
-      console.log("fetched user", user);
+      //console.log("fetched user", user);
       let { password: db_password, role, userId } = user[0];
       if (db_password != password) {
         return res.status(401).send("Incorrect password!");
