@@ -12,9 +12,13 @@ import { authenticate } from "./auth";
 
 const confirmToken = authenticate(JWT_SECRET);
 
-router.post("/ping", confirmToken, controllers.Ping);
+router.post("/ping", controllers.Ping);
 router.post("/register", controllers.Register);
 router.post("/login", controllers.Login);
+
+//CRUD shift
+router.post("/shift", confirmToken, controllers.CreateShift);
+router.get("/shifts/:userId", confirmToken, controllers.GetShifts);
 
 router.all("/*", controllers.Fallback);
 router.use((error, _, res, __) => {

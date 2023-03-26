@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 import { TokenData } from "./types";
 const JWT_SECRET: string = process.env.JWT_SECRET || "";
@@ -56,7 +57,8 @@ export const controllers = {
       let token: string = jwt.sign(tokenData, JWT_SECRET, { expiresIn: "30m" });
       res.status(201).json({
         message: "Successful registration!",
-        access_token: token
+        access_token: token,
+        userId
       });
     } catch (e) {
       console.log("signup error", e);
@@ -100,6 +102,98 @@ export const controllers = {
     } catch (e) {
       console.log("signin error", e);
       res.status(500).send(`Signin error: ${e.message}`);
+    }
+  },
+
+  CreateShift: async (req, res) => {
+    try {
+      let { userId: adminId, role } = req.decode;
+      if (!(adminId && role === "admin")) {
+        return res.status(406).send("'Token not validated");
+      }
+      if (role !== "admin") {
+        return res.status(406).send("Action unauthorized");
+      }
+      //parse params
+      let { userId, timeString } = req.body;
+      if (!(userId && timeString)) {
+        return res
+          .status(406)
+          .send(
+            "One of required params not passed"
+          );
+      }
+      /*
+        parse timeString:
+      */
+      let input = timeString.split("/");
+      let year = parseInt(input[0]);
+      let month = parseInt(input[1]);
+      let day = parseInt(input[2]);
+      if (!["0-8", "8-16", "16-24"].includes(input[3])){
+        return res.status(406).send("Invalid timeslot");
+      }
+      let timeSlot = Math.ceil(parseInt(input[3].split("-")[0])/8);
+      console.log("time:", timeSlot, year, month, day);
+      //validate date:
+      let formatDate = moment([year, month-1, day]).format("YYYY/MM/DD");
+      console.log("formatDate:", formatDate);
+      let validDate = moment(formatDate, 'YYYY/MM/DD',true).isValid();
+      if (!validDate){
+        return res.status(406).send("Date not validated");
+      }
+      let date = new Date(year, month-1, day);
+
+      /*
+        check if there's a shift on this day
+      */
+      let shiftMatch = await Shift.find({
+        userId,
+        day: date
+      });
+      if (shiftMatch.length > 0) {
+        return res.status(401).send("Shift already assigned on this day!");
+      }
+      /*
+        create shift
+      */
+      let shiftId: string = uuidv4();
+      let shift = new Shift({
+        shiftId,
+        userId,
+        timeSlot,
+        day: date
+      });
+      console.log("creating shift:", shift);
+      await shift.save();
+      return res.status(201).json({
+        message: "Shift successfully created!",
+        shiftId
+      });
+    } catch (e) {
+      console.error("createShift error", e);
+      res.status(500).send(`createShift error: ${e.message}`);
+    }
+  },
+
+  GetShifts: async (req, res) => {
+    try {
+      let { userId } = req.params;
+      if (!userId) {
+        return res.status(406).send("'userId' param not passed!");
+      }
+      //product crud
+      let shifts = await Shift.find({ userId });
+      console.log("shifts", shifts);
+      if (!(shifts.length> 0)) {
+        return res.send("Shifts not found!");
+      }
+      return res.json({
+        data: shifts
+      });
+    } catch (e) {
+      console.error("GetShifts error", e);
+      res.status(500).send(`GetShifts error: ${e.message}`);
     }
   },
 };
