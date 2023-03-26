@@ -7,7 +7,7 @@ import { controllers } from "./controllers";
 
 router.post("/ping", controllers.Ping);
 router.post("/register", controllers.Register);
-//router.post("/login", controllers.Login);
+router.post("/login", controllers.Login);
 
 router.all("/*", controllers.Fallback);
 router.use((error, _, res, __) => {

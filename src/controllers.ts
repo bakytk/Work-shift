@@ -55,5 +55,44 @@ export const controllers = {
       console.log("signup error", e);
       res.status(500).send(`Signup error`);
     }
-  }
+  },
+
+  Login: async (req, res) => {
+    /*
+      Only admins can login
+    */
+    try {
+      let { username, password } = req.body;
+      if (!(username && password)) {
+        return res.status(406).send("Username or password absent!");
+      }
+      let user = await User.find({
+        username,
+        password
+      });
+      if (!(user.length > 0)) {
+        return res.status(401).send("Username not found!");
+      }
+      console.log("fetched user", user);
+      let { password: db_password, role, userId } = user[0];
+      if (db_password != password) {
+        return res.status(401).send("Incorrect password!");
+      }
+      if (role != "admin") {
+        return res.status(401).send("User unauthorized!");
+      }
+      let tokenData: TokenData = {
+        userId,
+        role
+      };
+      let token: string = jwt.sign(tokenData, JWT_SECRET, { expiresIn: "30m" });
+      res.json({
+        message: "Successful authentication!",
+        access_token: token
+      });
+    } catch (e) {
+      console.log("signin error", e);
+      res.status(500).send(`Signin error: ${e.message}`);
+    }
+  },
 };
