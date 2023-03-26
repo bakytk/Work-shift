@@ -205,15 +205,15 @@ export const controllers = {
       if (!(adminId && role === "admin")) {
         return res.status(401).send("User not authorized");
       }
-      let { userId, shiftId, timeString } = req.body;
-      if (! (userId && shiftId && timeString)) {
+      let { shiftId, timeString } = req.body;
+      if (! (shiftId && timeString)) {
         return res.status(406).send("One of required params not passed!");
       }
 
       /*
         check if shiftId, userId match
       */
-      let shiftMatch = await Shift.findOne({ userId, shiftId });
+      let shiftMatch = await Shift.findOne({ shiftId });
       if (!shiftMatch) {
         return res.status(404).send("Shift-user pair not found!");
       }
@@ -223,7 +223,7 @@ export const controllers = {
       */
       let [year, month, day, timeSlot] = stringParser(timeString, res);
       let date = new Date(year, month, day);
-      await Shift.findOneAndUpdate({ userId, shiftId }, { userId, shiftId, timeSlot, day: date});
+      await Shift.findOneAndUpdate({ shiftId }, { shiftId, timeSlot, day: date});
       return res.json({ message: "Shift successfully updated!"});
     } catch (e) {
       console.error("putShift", e);
