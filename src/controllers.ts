@@ -224,10 +224,32 @@ export const controllers = {
       let [year, month, day, timeSlot] = stringParser(timeString, res);
       let date = new Date(year, month, day);
       await Shift.findOneAndUpdate({ userId, shiftId }, { userId, shiftId, timeSlot, day: date});
-      return res.status(204).json({ message: "Shift successfully updated!" });
+      return res.json({ message: "Shift successfully updated!"});
     } catch (e) {
       console.error("putShift", e);
       res.status(500).send(`putShift error: ${e.message}`);
+    }
+  },
+
+  RemoveShift: async (req, res) => {
+    try {
+      let { userId, role } = req.decode;
+      if (!(userId && role === "admin")) {
+        return res.status(401).send("User not authorized");
+      }
+      let { shiftId } = req.params;
+      if (!shiftId) {
+        return res.status(406).send("shiftId not passed!");
+      }
+      let shift = await Shift.findOne({shiftId});
+      if (!shift) {
+        return res.status(404).send("shiftId not found!");
+      }
+      await Shift.deleteOne({ shiftId });
+      return res.json({ message: "Shift successfully deleted!" });
+    } catch (e) {
+      console.error("deleteProduct error", e);
+      return res.status(500).send(`deleteProduct error: ${e.message}`);
     }
   },
 };

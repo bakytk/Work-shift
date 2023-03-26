@@ -20,6 +20,7 @@ router.post("/login", controllers.Login);
 router.post("/shift", confirmToken, controllers.CreateShift);
 router.get("/shifts/:userId", confirmToken, controllers.GetShifts);
 router.put("/shift", confirmToken, controllers.UpdateTime);
+router.delete("/shift/:shiftId", confirmToken, controllers.RemoveShift);
 
 router.all("/*", controllers.Fallback);
 router.use((error, _, res, __) => {
