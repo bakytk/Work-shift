@@ -11,28 +11,35 @@ import { IUser } from "./types";
 import { User, Shift } from "./db/models";
 
 function stringParser (string, res) {
-  let input = string.split("/");
-  let year = parseInt(input[0]);
-  let month = parseInt(input[1]);
-  let day = parseInt(input[2]);
-  if (!["0-8", "8-16", "16-24"].includes(input[3])){
-    return res.status(406).send("Invalid timeslot");
+  try {
+    let input = string.split("/");
+    let year = parseInt(input[0]);
+    let month = parseInt(input[1]);
+    let day = parseInt(input[2]);
+    if (!["0-8", "8-16", "16-24"].includes(input[3])){
+      return res.send("Invalid timeslot");
+    }
+    let timeSlot = Math.ceil(parseInt(input[3].split("-")[0])/8);
+    console.log("incoming timeSlot:", timeSlot, year, month, day);
+    //validate date:
+    let formatDate = moment([year, month-1, day]).format("YYYY/MM/DD");
+    console.log("formatDate:", formatDate);
+    let validDate = moment(formatDate, 'YYYY/MM/DD',true).isValid();
+    console.log("validDate:", validDate);
+    if (!validDate){
+      return null;
+    }
+    return [year, month-1, day, timeSlot];
+  } catch (e) {
+    console.log("stringParser error: ", e);
+    return null;
   }
-  let timeSlot = Math.ceil(parseInt(input[3].split("-")[0])/8);
-  //console.log("time:", timeSlot, year, month, day);
-  //validate date:
-  let formatDate = moment([year, month-1, day]).format("YYYY/MM/DD");
-  //console.log("formatDate:", formatDate);
-  let validDate = moment(formatDate, 'YYYY/MM/DD',true).isValid();
-  if (!validDate){
-    return res.status(406).send("Date not validated");
-  }
-  return [year, month-1, day, timeSlot];
+  
 }
 
 export const controllers = {
   Fallback: async (req, res) => {
-    return res.status(405).json({ message: "Invalid endpoint or method" });
+    return res.json({ message: "Invalid endpoint or method" });
   },
 
   Ping: async (req, res) => {
@@ -72,7 +79,7 @@ export const controllers = {
         role
       };
       let token: string = jwt.sign(tokenData, JWT_SECRET, { expiresIn: "30m" });
-      res.status(201).json({
+      return res.status(201).json({
         message: "Successful registration!",
         access_token: token,
         userId
@@ -96,8 +103,10 @@ export const controllers = {
         username,
         password
       });
+      console.log("User: ", user);
+
       if (!(user.length > 0)) {
-        return res.status(401).send("Username not found!");
+        return res.status(401).send("Username or password don't match!");
       }
       //console.log("fetched user", user);
       let { password: db_password, role, userId } = user[0];
@@ -111,7 +120,7 @@ export const controllers = {
         userId,
         role
       };
-      let token: string = jwt.sign(tokenData, JWT_SECRET, { expiresIn: "30m" });
+      let token: string = jwt.sign(tokenData, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         message: "Successful authentication!",
         access_token: token
@@ -143,7 +152,9 @@ export const controllers = {
       /*
         parse timeString:
       */
-      let [year, month, day, timeSlot] = stringParser(timeString, res);
+      let dateParse = stringParser(timeString, res);
+      if (!dateParse) return res.send("Invalid date.");
+      let [year, month, day, timeSlot] = dateParse;
       let date = new Date(year, month, day);
 
       /*
@@ -206,6 +217,7 @@ export const controllers = {
         return res.status(401).send("User not authorized");
       }
       let { shiftId, timeString } = req.body;
+      console.log("UpdateTime req.body: ", req.body);
       if (! (shiftId && timeString)) {
         return res.status(406).send("One of required params not passed!");
       }
